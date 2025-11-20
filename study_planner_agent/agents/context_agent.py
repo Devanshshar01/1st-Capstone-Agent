@@ -1,35 +1,22 @@
 import logging
-from typing import Dict, Any, Optional
-import json
-import os
+from typing import Dict, Any
+from tools.memory_tools import save_user_profile, load_user_profile, update_study_preferences, get_user_stats
 
 logger = logging.getLogger(__name__)
 
 class ContextAgent:
     """
-    Agent maintains user profiles and memory.
+    Agent responsible for managing user profiles and memory.
     """
-    def __init__(self, data_dir: str = "./data"):
+    def __init__(self, data_dir: str):
         self.data_dir = data_dir
-        self.users_dir = os.path.join(data_dir, "users")
         logger.info("Context Agent initialized.")
 
-    def get_user_context(self, user_id: str) -> Dict[str, Any]:
-        """
-        Retrieves user context/profile.
-        """
-        user_file = os.path.join(self.users_dir, f"{user_id}.json")
-        if os.path.exists(user_file):
-            with open(user_file, 'r') as f:
-                return json.load(f)
-        return {}
+    def get_profile(self, user_id: str) -> Dict[str, Any]:
+        return load_user_profile(user_id)
 
-    def update_user_context(self, user_id: str, data: Dict[str, Any]):
-        """
-        Updates user context.
-        """
-        user_file = os.path.join(self.users_dir, f"{user_id}.json")
-        # Merge or overwrite logic here
-        with open(user_file, 'w') as f:
-            json.dump(data, f, indent=4)
-        logger.info(f"Updated context for user {user_id}")
+    def save_profile(self, user_id: str, data: Dict[str, Any]) -> bool:
+        return save_user_profile(user_id, data)
+        
+    def get_stats(self, user_id: str) -> Dict[str, Any]:
+        return get_user_stats(user_id)

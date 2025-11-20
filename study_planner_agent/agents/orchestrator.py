@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,16 @@ class OrchestratorAgent:
         """
         logger.info(f"Processing request for user {user_id}: {user_input}")
         
-        # TODO: Implement intent recognition using Gemini
-        # For now, simple keyword matching or pass-through
+        # Simple routing logic for demo purposes
+        # In a real app, this would use Gemini to classify intent
         
-        return f"Processed: {user_input}"
+        if "progress" in user_input.lower():
+            if "progress" in self.agents:
+                return self.agents["progress"].get_report(user_id)
+        
+        if "motivate" in user_input.lower():
+            if "reminder" in self.agents:
+                self.agents["reminder"].motivate(user_id)
+                return "Motivation sent!"
+                
+        return "I'm listening. You can ask for 'progress' or 'motivate me', or use the /schedule command to create a plan."

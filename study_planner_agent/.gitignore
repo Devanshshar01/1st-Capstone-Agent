@@ -20,14 +20,24 @@ wheels/
 .installed.cfg
 *.egg
 
+# Virtual Environment
+venv/
+env/
+ENV/
+
 # Environment Variables
 .env
-
-# Data
-data/users/
-data/schedules/
-*.log
 
 # IDEs
 .vscode/
 .idea/
+
+# Data (Ignore content but keep structure)
+data/*
+!data/users/
+!data/schedules/
+!data/sessions/
+!data/users/.gitkeep
+!data/schedules/.gitkeep
+!data/sessions/.gitkeep
+!data/demo_data.py

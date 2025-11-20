@@ -1,36 +1,32 @@
 import os
-import logging
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-# Configuration Constants
+# API Configuration
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+
+# Application Settings
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 DATA_DIR = os.getenv("DATA_DIR", "./data")
+START_DATE = os.getenv("START_DATE", "2025-11-21")
 
-# Validation
-if not GOOGLE_API_KEY:
-    raise ValueError("GOOGLE_API_KEY is not set in environment variables.")
+# Constants
+DIFFICULTY_MULTIPLIERS = {
+    "high": 1.5,
+    "medium": 1.0,
+    "low": 0.7
+}
 
-# Ensure data directories exist
-USERS_DIR = os.path.join(DATA_DIR, "users")
-SCHEDULES_DIR = os.path.join(DATA_DIR, "schedules")
+SESSION_DEFAULTS = {
+    "duration": 2,  # hours
+    "break_duration": 15,  # minutes
+    "max_daily_hours": 5
+}
 
-os.makedirs(USERS_DIR, exist_ok=True)
-os.makedirs(SCHEDULES_DIR, exist_ok=True)
-
-# Logging Configuration
-LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-logging.basicConfig(
-    level=getattr(logging, LOG_LEVEL),
-    format=LOG_FORMAT,
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler("agent.log")
-    ]
-)
-
-logger = logging.getLogger("StudyPlannerAgent")
-logger.info("Configuration loaded successfully.")
+PEAK_HOURS_MAP = {
+    "morning": 8,    # 08:00
+    "afternoon": 14, # 14:00
+    "evening": 18    # 18:00
+}

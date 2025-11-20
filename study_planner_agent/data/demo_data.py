@@ -1,30 +1,36 @@
-import json
-import os
-
-def create_demo_data(data_dir: str = "./data"):
-    """
-    Creates demo data for users and schedules.
-    """
-    users_dir = os.path.join(data_dir, "users")
-    os.makedirs(users_dir, exist_ok=True)
-    
-    demo_user = {
-        "id": "student_01",
-        "name": "Alex",
-        "preferences": {
-            "study_hours_per_day": 4,
-            "preferred_times": ["morning", "evening"]
+DEMO_USER_PROFILE = {
+    "user_id": "demo_user",
+    "preferences": {
+        "daily_max_hours": 5,
+        "peak_hours": "morning",
+        "session_duration": 2,
+        "preferred_days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    },
+    "courses": {
+        "Discrete Mathematics": {
+            "topics": ["Sets", "Relations", "Functions", "Logic", "Graphs", "Trees", "Combinatorics"],
+            "difficulty": "high",
+            "exam_date": "2025-12-22"
         },
-        "courses": [
-            {"name": "CS101", "difficulty": 2, "credits": 3},
-            {"name": "MATH202", "difficulty": 3, "credits": 4}
-        ]
+        "Programming Using C Language": {
+            "topics": ["Basics", "Control Flow", "Arrays", "Functions", "Pointers", "Structures", "File Handling"],
+            "difficulty": "medium",
+            "exam_date": "2025-12-26"
+        },
+        "Fundamentals of Computers and IT": {
+            "topics": ["Computer Basics", "OS", "Networking", "Internet", "Database", "Security"],
+            "difficulty": "medium",
+            "exam_date": "2025-12-29"
+        },
+        "Web Technologies": {
+            "topics": ["HTML", "CSS", "JavaScript", "DOM", "Forms", "Responsive Design", "Hosting"],
+            "difficulty": "medium",
+            "exam_date": "2025-12-31"
+        },
+        "Technical Communication": {
+            "topics": ["Grammar", "Writing", "Speaking", "Listening", "Reading", "Presentation", "Interviews"],
+            "difficulty": "low",
+            "exam_date": "2026-01-02"
+        }
     }
-    
-    with open(os.path.join(users_dir, "student_01.json"), 'w') as f:
-        json.dump(demo_user, f, indent=4)
-        
-    print("Demo data created.")
-
-if __name__ == "__main__":
-    create_demo_data()
+}

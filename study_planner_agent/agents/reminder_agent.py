@@ -1,25 +1,33 @@
 import logging
-from typing import List
+from typing import Dict, Any
+from tools.notification_tools import schedule_reminder, send_notification, get_upcoming_reminders, generate_motivational_message
 
 logger = logging.getLogger(__name__)
 
 class ReminderAgent:
     """
-    Agent sends notifications and motivational messages.
+    Agent responsible for sending notifications and motivation.
     """
     def __init__(self):
         logger.info("Reminder Agent initialized.")
 
-    def send_reminder(self, user_id: str, message: str):
+    def send_alert(self, user_id: str, message: str, title: str = "Alert"):
         """
-        Sends a reminder to the user.
+        Sends an immediate alert.
         """
-        logger.info(f"Sending reminder to {user_id}: {message}")
-        # TODO: Implement notification delivery (e.g., print to console for CLI)
-        print(f"NOTIFICATION: {message}")
+        send_notification(user_id, {"title": title, "message": message})
 
-    def get_pending_reminders(self, user_id: str) -> List[str]:
+    def check_reminders(self, user_id: str):
         """
-        Retrieves pending reminders.
+        Checks and displays upcoming reminders.
         """
-        return []
+        reminders = get_upcoming_reminders(user_id)
+        for rem in reminders:
+            self.send_alert(user_id, rem["message"], rem["title"])
+            
+    def motivate(self, user_id: str):
+        """
+        Sends a motivational message.
+        """
+        msg = generate_motivational_message({})
+        self.send_alert(user_id, msg, "Motivation")

@@ -4,7 +4,7 @@ import argparse
 import platform
 import logging
 import time
-from typing import Optional
+import json
 from colorama import init, Fore, Style
 import google.generativeai as genai
 
@@ -57,9 +57,6 @@ def check_system_requirements() -> bool:
     
     try:
         genai.configure(api_key=GOOGLE_API_KEY)
-        # Simple model list check to verify connectivity
-        # Note: This might fail if the key doesn't have list permissions, but usually works for valid keys
-        # Using a lightweight call if possible, or just assuming config worked if no error raised immediately
         logger.info("Google API Key configured.")
     except Exception as e:
         logger.critical(f"Failed to configure Google API: {e}")
@@ -97,13 +94,49 @@ def initialize_agents() -> OrchestratorAgent:
     logger.info("All agents initialized and registered.")
     return orchestrator
 
+def collect_schedule_input():
+    """Interactive wizard to collect schedule data."""
+    print(f"\n{Fore.YELLOW}=== Schedule Creation Wizard ==={Style.RESET_ALL}")
+    
+    courses = {}
+    while True:
+        name = input(f"\n{Fore.CYAN}Enter Course Name (or 'done' to finish): {Style.RESET_ALL}").strip()
+        if name.lower() == 'done':
+            if not courses:
+                print("Please add at least one course.")
+                continue
+            break
+            
+        topics_str = input(f"Enter topics for {name} (comma separated): ").strip()
+        topics = [t.strip() for t in topics_str.split(",") if t.strip()]
+        
+        difficulty = input(f"Difficulty (High/Medium/Low): ").strip().lower()
+        if difficulty not in ['high', 'medium', 'low']:
+            difficulty = 'medium'
+            
+        exam_date = input(f"Exam Date (YYYY-MM-DD): ").strip()
+        
+        courses[name] = {
+            "topics": topics,
+            "difficulty": difficulty,
+            "exam_date": exam_date
+        }
+        
+    print(f"\n{Fore.CYAN}Preferences:{Style.RESET_ALL}")
+    daily_hours = input("Max daily study hours (default 5): ").strip()
+    daily_hours = int(daily_hours) if daily_hours.isdigit() else 5
+    
+    peak_pref = input("Peak hours (Morning/Afternoon/Evening): ").strip().lower()
+    
+    return courses, {"daily_max_hours": daily_hours, "peak_hours": peak_pref}
+
 def run_cli(orchestrator: OrchestratorAgent):
     """Runs the Command Line Interface."""
     print(ASCII_ART)
     print(f"{Fore.GREEN}Welcome to your Personal Study Planner AI Agent!{Style.RESET_ALL}")
     print(f"Type {Fore.YELLOW}/help{Style.RESET_ALL} for available commands.")
     
-    user_id = "student_01" # Default user for CLI demo
+    user_id = "student_01"
     
     while True:
         try:
@@ -113,24 +146,32 @@ def run_cli(orchestrator: OrchestratorAgent):
                 continue
                 
             if user_input.lower() in ['/quit', '/exit', 'exit', 'quit']:
-                print(f"{Fore.GREEN}Goodbye! Saving session...{Style.RESET_ALL}")
-                # TODO: Trigger save if needed
+                print(f"{Fore.GREEN}Goodbye!{Style.RESET_ALL}")
                 break
                 
             if user_input.lower() == '/help':
                 print(f"\n{Fore.YELLOW}Available Commands:{Style.RESET_ALL}")
                 print("  /help      - Show this help message")
-                print("  /reset     - Reset current session")
-                print("  /progress  - Show quick progress summary")
+                print("  /schedule  - Create a new study plan")
+                print("  /progress  - Show progress report")
                 print("  /quit      - Exit the application")
                 continue
-                
-            if user_input.lower() == '/progress':
-                # Direct call to progress agent via orchestrator if supported, 
-                # or just simulate a user asking for progress
-                user_input = "Show my progress"
             
-            # Process request
+            if user_input.lower() == '/schedule':
+                courses, prefs = collect_schedule_input()
+                print(f"\n{Fore.BLUE}Generating schedule...{Style.RESET_ALL}")
+                result = orchestrator.agents['scheduler'].create_schedule(user_id, courses, prefs)
+                
+                if result['status'] == 'success':
+                    print(f"{Fore.GREEN}Schedule created successfully!{Style.RESET_ALL}")
+                    # print(json.dumps(result['schedule']['daily_schedule'], indent=2)) # Too verbose
+                    print(f"Plan covers {len(result['schedule']['daily_schedule'])} days.")
+                    print("Check 'data/users/student_01.json' for full details.")
+                else:
+                    print(f"{Fore.RED}Error: {result['message']}{Style.RESET_ALL}")
+                continue
+
+            # Process request via orchestrator
             response = orchestrator.process_request(user_input, user_id)
             print(f"{Fore.MAGENTA}Agent:{Style.RESET_ALL} {response}")
             
@@ -166,7 +207,10 @@ def main():
     
     if args.demo:
         print(f"{Fore.YELLOW}Running in DEMO mode...{Style.RESET_ALL}")
-        # Could trigger specific demo setup here if needed
+        from data.demo_data import DEMO_USER_PROFILE
+        print("Loading demo profile...")
+        orchestrator.agents['scheduler'].create_schedule("demo_user", DEMO_USER_PROFILE["courses"], DEMO_USER_PROFILE["preferences"])
+        print(f"{Fore.GREEN}Demo schedule created!{Style.RESET_ALL}")
         
     if args.mode == 'cli':
         run_cli(orchestrator)

@@ -1,0 +1,203 @@
+{
+    "courses": {
+        "Math": {
+            "topics": [
+                "Algebra",
+                "Calculus"
+            ],
+            "difficulty": "high",
+            "exam_date": "2025-12-20"
+        }
+    },
+    "preferences": {
+        "daily_max_hours": 5,
+        "peak_hours": "morning",
+        "session_duration": 2
+    },
+    "current_schedule": {
+        "course_analysis": {
+            "Math": {
+                "total_hours": 12.0,
+                "hours_per_week": [
+                    3.0,
+                    3.0,
+                    3.0,
+                    3.0
+                ],
+                "topics_distribution": {
+                    "Algebra": 6.0,
+                    "Calculus": 6.0
+                },
+                "exam_date": "2025-12-20",
+                "study_days": 27
+            }
+        },
+        "daily_schedule": {
+            "2025-11-21": [
+                {
+                    "subject": "Math",
+                    "topic": "Algebra",
+                    "start_time": "08:00",
+                    "end_time": "10:00",
+                    "duration": 2
+                },
+                {
+                    "subject": "Math",
+                    "topic": "Calculus",
+                    "start_time": "10:15",
+                    "end_time": "12:15",
+                    "duration": 2
+                }
+            ],
+            "2025-11-24": [],
+            "2025-11-25": [],
+            "2025-11-26": [],
+            "2025-11-27": [],
+            "2025-11-28": [
+                {
+                    "subject": "Math",
+                    "topic": "Algebra",
+                    "start_time": "08:00",
+                    "end_time": "10:00",
+                    "duration": 2
+                },
+                {
+                    "subject": "Math",
+                    "topic": "Calculus",
+                    "start_time": "10:15",
+                    "end_time": "12:15",
+                    "duration": 2
+                }
+            ],
+            "2025-12-01": [],
+            "2025-12-02": [],
+            "2025-12-03": [],
+            "2025-12-04": [],
+            "2025-12-05": [
+                {
+                    "subject": "Math",
+                    "topic": "Algebra",
+                    "start_time": "08:00",
+                    "end_time": "10:00",
+                    "duration": 2
+                },
+                {
+                    "subject": "Math",
+                    "topic": "Calculus",
+                    "start_time": "10:15",
+                    "end_time": "12:15",
+                    "duration": 2
+                }
+            ],
+            "2025-12-08": [],
+            "2025-12-09": [],
+            "2025-12-10": [],
+            "2025-12-11": [],
+            "2025-12-12": [
+                {
+                    "subject": "Math",
+                    "topic": "Algebra",
+                    "start_time": "08:00",
+                    "end_time": "10:00",
+                    "duration": 2
+                },
+                {
+                    "subject": "Math",
+                    "topic": "Calculus",
+                    "start_time": "10:15",
+                    "end_time": "12:15",
+                    "duration": 2
+                }
+            ],
+            "2025-12-15": [],
+            "2025-12-16": [],
+            "2025-12-17": [],
+            "2025-12-18": [
+                {
+                    "subject": "Math",
+                    "topic": "FINAL REVISION",
+                    "start_time": "09:00",
+                    "end_time": "12:00",
+                    "duration": 3.0
+                }
+            ],
+            "2025-12-19": [
+                {
+                    "subject": "Math",
+                    "topic": "FULL MOCK TEST",
+                    "start_time": "09:00",
+                    "end_time": "12:00",
+                    "duration": 3.0
+                }
+            ],
+            "2025-12-22": [],
+            "2025-12-23": [],
+            "2025-12-24": [],
+            "2025-12-25": [],
+            "2025-12-26": [],
+            "2025-12-29": [],
+            "2025-12-30": [],
+            "2025-12-31": [],
+            "2026-01-01": [],
+            "2025-11-23": [
+                {
+                    "subject": "General",
+                    "topic": "Weekly Progress Checkpoint",
+                    "start_time": "18:00",
+                    "end_time": "18:30",
+                    "duration": 0.5
+                }
+            ],
+            "2025-11-30": [
+                {
+                    "subject": "General",
+                    "topic": "Weekly Progress Checkpoint",
+                    "start_time": "18:00",
+                    "end_time": "18:30",
+                    "duration": 0.5
+                }
+            ],
+            "2025-12-07": [
+                {
+                    "subject": "General",
+                    "topic": "Weekly Progress Checkpoint",
+                    "start_time": "18:00",
+                    "end_time": "18:30",
+                    "duration": 0.5
+                }
+            ],
+            "2025-12-14": [
+                {
+                    "subject": "General",
+                    "topic": "Weekly Progress Checkpoint",
+                    "start_time": "18:00",
+                    "end_time": "18:30",
+                    "duration": 0.5
+                }
+            ],
+            "2025-12-21": [
+                {
+                    "subject": "General",
+                    "topic": "Weekly Progress Checkpoint",
+                    "start_time": "18:00",
+                    "end_time": "18:30",
+                    "duration": 0.5
+                }
+            ],
+            "2025-12-28": [
+                {
+                    "subject": "General",
+                    "topic": "Weekly Progress Checkpoint",
+                    "start_time": "18:00",
+                    "end_time": "18:30",
+                    "duration": 0.5
+                }
+            ]
+        },
+        "statistics": {
+            "total_courses": 1,
+            "start_date": "2025-11-21",
+            "end_date": "2026-01-02"
+        }
+    }
+}

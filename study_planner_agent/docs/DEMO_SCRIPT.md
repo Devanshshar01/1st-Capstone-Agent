@@ -1,21 +1,33 @@
-# Demo Script
+# Demo Script Walkthrough
 
-## Scenario: New Student Setup and Rescheduling
+## Running the Demo
+To execute the full demo scenario, run:
+```bash
+python study_planner_agent/demo_script.py
+```
 
-### Step 1: Initialization
-- Run `python data/demo_data.py` to create the "student_01" profile.
-- Run `python app.py` to start the agent.
+## Scenario Overview
+The demo simulates a student ("demo_user") interacting with the agent to prepare for exams in late December 2025.
 
-### Step 2: Interaction
-**User:** "Create a study plan for me."
-**Agent:** (Orchestrator delegates to Scheduler) "Creating schedule for user student_01..."
+### Act 1: Schedule Creation
+*   **User**: Requests a study plan.
+*   **System**: Loads the demo profile (5 subjects, specific exam dates).
+*   **Scheduler**: Generates a plan respecting the 5-hour daily limit and morning preference.
+*   **Output**: Shows a preview of the first week's schedule.
 
-**User:** "I missed my session yesterday."
-**Agent:** (Orchestrator delegates to Rescheduler) "Rescheduling session..."
+### Act 2: Progress Update
+*   **User**: Asks for a status report.
+*   **Progress Agent**: Displays an ASCII bar chart showing completion rates for each subject.
 
-**User:** "How am I doing?"
-**Agent:** (Orchestrator delegates to Progress) "Progress Report: On Track"
+### Act 3: Handling Missed Sessions
+*   **User**: Reports a missed "Discrete Math" session.
+*   **Rescheduler**: Acknowledges the miss and proposes a makeup slot on the next available Saturday.
 
-### Step 3: Verification
-- Check `data/users/student_01.json` for updates.
-- Check logs in `agent.log` for internal trace.
+### Act 4: Motivation
+*   **User**: Expresses feeling overwhelmed.
+*   **Reminder Agent**: Sends an encouraging message displayed in a formatted box.
+
+## Key Verification Points
+*   Verify that exam dates are respected (Revision/Mock tests scheduled correctly).
+*   Check that study hours are distributed based on difficulty (High difficulty subjects get more time).
+*   Ensure the makeup slot logic finds a valid future time.
