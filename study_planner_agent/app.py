@@ -183,10 +183,20 @@ def run_cli(orchestrator: OrchestratorAgent):
             print(f"{Fore.RED}An error occurred. Please try again.{Style.RESET_ALL}")
 
 from flask import Flask, render_template, request, jsonify, send_from_directory
+from utils.automation import AutomationEngine
+
+# Global automation engine
+automation_engine = None
 
 def run_web(orchestrator: OrchestratorAgent):
     """Runs the Web Interface using Flask."""
+    global automation_engine
+    
     print(f"{Fore.BLUE}Starting Web UI...{Style.RESET_ALL}")
+    
+    # Initialize automation engine
+    automation_engine = AutomationEngine()
+    print(f"{Fore.GREEN}✨ Automation Engine started{Style.RESET_ALL}")
     
     # Define template and static folders explicitly
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -208,14 +218,18 @@ def run_web(orchestrator: OrchestratorAgent):
         prefs = data.get('preferences', {})
         
         result = orchestrator.agents['scheduler'].create_schedule(user_id, courses, prefs)
+        
+        # Start automation for this schedule
+        if result.get('status') == 'success':
+            automation_engine.start_automation(user_id, result['schedule'])
+            print(f"{Fore.GREEN}🤖 Automation activated for schedule{Style.RESET_ALL}")
+            
         return jsonify(result)
         
     @app.route('/api/progress', methods=['GET'])
     def get_progress():
         user_id = "web_user"
         report = orchestrator.agents['progress'].get_report(user_id)
-        # Parse ASCII report to JSON or just return text? 
-        # For now, let's return the raw report and some metrics
         metrics = orchestrator.agents['progress'].get_insights(user_id)
         return jsonify({"report": report, "metrics": metrics})
         
@@ -226,9 +240,26 @@ def run_web(orchestrator: OrchestratorAgent):
         user_id = "web_user"
         response = orchestrator.process_request(user_input, user_id)
         return jsonify({"response": response})
+    
+    @app.route('/api/automation/status', methods=['GET'])
+    def automation_status():
+        """Get automation engine status."""
+        jobs = automation_engine.scheduler.get_jobs()
+        return jsonify({
+            "status": "active",
+            "total_jobs": len(jobs),
+            "jobs": [{"id": job.id, "next_run": str(job.next_run_time)} for job in jobs]
+        })
 
     print(f"{Fore.GREEN}Server running at http://127.0.0.1:5000{Style.RESET_ALL}")
-    app.run(debug=True, use_reloader=False)
+    
+    try:
+        app.run(debug=True, use_reloader=False)
+    finally:
+        # Cleanup on shutdown
+        if automation_engine:
+            automation_engine.shutdown()
+
 
 def main():
     parser = argparse.ArgumentParser(description="Personal Study Planner AI Agent")
