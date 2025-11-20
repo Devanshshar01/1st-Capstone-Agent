@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Planner AI - Your Personal Study Assistant</title>
+    <meta name="description" content="AI-powered study planner to optimize your learning schedule">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">📚</div>
+                <div class="logo-text">
+                    <h1>Study Planner AI</h1>
+                    <p>Your Smart Study Companion</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">
+                    <span class="theme-icon">🌙</span>
+                </button>
+                <button class="export-btn" id="export-btn" title="Export Schedule">
+                    <span>📥 Export</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <button class="nav-btn active" data-tab="dashboard">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </button>
+            <button class="nav-btn" data-tab="schedule">
+                <span class="nav-icon">📅</span>
+                <span>Schedule</span>
+            </button>
+            <button class="nav-btn" data-tab="progress">
+                <span class="nav-icon">📈</span>
+                <span>Progress</span>
+            </button>
+            <button class="nav-btn" data-tab="chat">
+                <span class="nav-icon">💬</span>
+                <span>Chat</span>
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Tab -->
+            <div id="dashboard-tab" class="tab-content active">
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-content">
+                            <h3 id="total-courses">0</h3>
+                            <p>Total Courses</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏰</div>
+                        <div class="stat-content">
+                            <h3 id="total-hours">0h</h3>
+                            <p>Study Hours Planned</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-content">
+                            <h3 id="next-exam">-</h3>
+                            <p>Next Exam</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <h3 id="avg-progress">0%</h3>
+                            <p>Avg Progress</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-content">
+                    <div class="card upcoming-sessions">
+                        <h2>📆 Upcoming Sessions</h2>
+                        <div id="upcoming-list" class="session-list">
+                            <p class="empty-state">Create a schedule to see upcoming sessions</p>
+                        </div>
+                    </div>
+                    <div class="card quick-stats">
+                        <h2>📈 Quick Overview</h2>
+                        <canvas id="progress-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Tab -->
+            <div id="schedule-tab" class="tab-content">
+                <div class="card">
+                    <div class="schedule-header">
+                        <div>
+                            <h2>Create Your Study Plan</h2>
+                            <p class="subtitle">Customize every aspect of your schedule</p>
+                        </div>
+                        <div class="template-actions">
+                            <button class="btn-secondary small" id="save-template">💾 Save Template</button>
+                            <button class="btn-secondary small" id="load-template">📂 Load Template</button>
+                        </div>
+                    </div>
+
+                    <form id="schedule-form">
+                        <!-- Courses Section -->
+                        <div class="form-section">
+                            <h3>📖 Your Courses</h3>
+                            <div id="courses-container">
+                                <div class="course-item">
+                                    <input type="text" class="course-name" placeholder="Course Name" required>
+                                    <input type="text" class="course-topics" placeholder="Topics (comma separated)"
+                                        required>
+                                    <select class="course-difficulty">
+                                        <option value="low">Low 😊</option>
+                                        <option value="medium" selected>Medium 😐</option>
+                                        <option value="high">High 😰</option>
+                                    </select>
+                                    <select class="course-priority">
+                                        <option value="low">Low Priority</option>
+                                        <option value="medium" selected>Medium Priority</option>
+                                        <option value="high">High Priority 🔥</option>
+                                    </select>
+                                    <input type="date" class="course-exam" required>
+                                    <button type="button" class="remove-course" title="Remove">×</button>
+                                </div>
+                            </div>
+                            <button type="button" id="add-course-btn" class="btn-secondary">➕ Add Course</button>
+                        </div>
+
+                        <!-- Basic Preferences -->
+                        <div class="form-section">
+                            <h3>⚙️ Basic Preferences</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>🕐 Max Daily Hours</label>
+                                    <input type="number" id="daily-hours" min="1" max="12" value="5" required>
+                                    <small>Maximum hours per day</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>☀️ Peak Study Time</label>
+                                    <select id="peak-hours">
+                                        <option value="morning" selected>🌅 Morning (8 AM)</option>
+                                        <option value="afternoon">☀️ Afternoon (2 PM)</option>
+                                        <option value="evening">🌆 Evening (6 PM)</option>
+                                    </select>
+                                    <small>When you're most productive</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>⏱️ Session Duration</label>
+                                    <input type="number" id="session-duration" min="1" max="4" value="2" required>
+                                    <small>Hours per study session</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Preferences (Collapsible) -->
+                        <div class="form-section">
+                            <h3 class="collapsible-header">
+                                🎯 Advanced Customization
+                                <span class="expand-icon">▼</span>
+                            </h3>
+                            <div class="collapsible-content" style="display: none;">
+                                <!-- Break Configuration -->
+                                <div class="sub-section">
+                                    <h4>☕ Break Configuration</h4>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label>Break Duration (minutes)</label>
+                                            <input type="number" id="break-duration" min="5" max="60" value="15">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Break Frequency</label>
+                                            <select id="break-frequency">
+                                                <option value="none">No Breaks</option>
+                                                <option value="hourly" selected>Every Hour</option>
+                                                <option value="pomodoro">Pomodoro (25/5)</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Long Break (hours)</label>
+                                            <input type="number" id="long-break" min="0" max="2" step="0.5" value="0.5">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Weekly Availability -->
+                                <div class="sub-section">
+                                    <h4>📅 Weekly Availability</h4>
+                                    <div class="availability-grid">
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" value="Monday" checked> Monday
+                                        </label>
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" value="Tuesday" checked> Tuesday
+                                        </label>
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" value="Wednesday" checked> Wednesday
+                                        </label>
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" value="Thursday" checked> Thursday
+                                        </label>
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" value="Friday" checked> Friday
+                                        </label>
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" value="Saturday"> Saturday
+                                        </label>
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" value="Sunday"> Sunday
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Time Slots -->
+                                <div class="sub-section">
+                                    <h4>🕒 Preferred Time Slots</h4>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label>Start Time</label>
+                                            <input type="time" id="start-time" value="08:00">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>End Time</label>
+                                            <input type="time" id="end-time" value="18:00">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Study Modes -->
+                                <div class="sub-section">
+                                    <h4>🎓 Study Preferences</h4>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label>Study Mode</label>
+                                            <select id="study-mode">
+                                                <option value="solo" selected>Solo Study</option>
+                                                <option value="group">Group Study</option>
+                                                <option value="mixed">Mixed</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Location</label>
+                                            <select id="study-location">
+                                                <option value="home" selected>Home</option>
+                                                <option value="library">Library</option>
+                                                <option value="cafe">Cafe</option>
+                                                <option value="campus">Campus</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Focus Level</label>
+                                            <select id="focus-level">
+                                                <option value="high">High (No distractions)</option>
+                                                <option value="medium" selected>Medium (Some breaks)</option>
+                                                <option value="flexible">Flexible</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Revision Settings -->
+                                <div class="sub-section">
+                                    <h4>🔄 Revision & Testing</h4>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label>Revision Days Before Exam</label>
+                                            <input type="number" id="revision-days" min="1" max="7" value="2">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Mock Test Days Before Exam</label>
+                                            <input type="number" id="mock-days" min="1" max="5" value="1">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Weekly Review</label>
+                                            <select id="weekly-review">
+                                                <option value="yes" selected>Yes (Sunday 6 PM)</option>
+                                                <option value="no">No</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary btn-large" id="generate-btn">
+                            <span>🚀 Generate My Custom Schedule</span>
+                            <div class="spinner"></div>
+                        </button>
+                    </form>
+
+                    <div id="schedule-result" class="result-container hidden">
+                        <div class="result-header">
+                            <h3>📅 Your Personalized Schedule</h3>
+                            <div class="schedule-actions">
+                                <button class="btn-secondary small" id="edit-schedule">✏️ Edit</button>
+                                <button class="view-toggle active" data-view="list">📝 List</button>
+                                <button class="view-toggle" data-view="calendar">📆 Calendar</button>
+                            </div>
+                        </div>
+                        <div id="schedule-display"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Tab -->
+            <div id="progress-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2>Your Progress</h2>
+                            <p class="subtitle">Track your learning journey and achievements</p>
+                        </div>
+                        <button id="refresh-progress-btn" class="btn-secondary">🔄 Refresh</button>
+                    </div>
+                    <div id="progress-display" class="progress-container"></div>
+                </div>
+            </div>
+
+            <!-- Chat Tab -->
+            <div id="chat-tab" class="tab-content">
+                <div class="card chat-card">
+                    <h2>Chat with Your Study Assistant</h2>
+                    <p class="subtitle">Ask questions, get motivation, or request schedule changes</p>
+                    <div id="chat-messages" class="chat-messages"></div>
+                    <form id="chat-form" class="chat-input-container">
+                        <input type="text" id="chat-input" placeholder="Ask me anything about your studies..." required
+                            autocomplete="off">
+                        <button type="submit" class="btn-primary"><span>Send</span></button>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Built with ❤️ using AI-powered scheduling algorithms | © 2025 Study Planner AI</p>
+        </footer>
+    </div>
+
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>

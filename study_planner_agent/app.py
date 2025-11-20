@@ -26,7 +26,7 @@ init(autoreset=True)
 # Setup logger
 logger = setup_logger()
 
-ASCII_ART = f"""
+ASCII_ART = r"""
 {Fore.CYAN}
    _____ _           _       {Fore.MAGENTA}_____  _                             
   {Fore.CYAN}/ ____| |         | |     {Fore.MAGENTA}|  __ \| |                            
@@ -182,16 +182,53 @@ def run_cli(orchestrator: OrchestratorAgent):
             logger.error(f"Runtime error: {e}")
             print(f"{Fore.RED}An error occurred. Please try again.{Style.RESET_ALL}")
 
-def run_web():
-    """Placeholder for Web UI."""
+from flask import Flask, render_template, request, jsonify, send_from_directory
+
+def run_web(orchestrator: OrchestratorAgent):
+    """Runs the Web Interface using Flask."""
     print(f"{Fore.BLUE}Starting Web UI...{Style.RESET_ALL}")
-    print(f"{Fore.YELLOW}NOTE: To use the ADK Web UI, please run the specific ADK command.{Style.RESET_ALL}")
-    print("For this demo, we are simulating a web server startup.")
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        print("Stopping Web UI...")
+    
+    # Define template and static folders explicitly
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    web_dir = os.path.join(base_dir, 'web')
+    template_dir = os.path.join(web_dir, 'templates')
+    static_dir = os.path.join(web_dir, 'static')
+    
+    app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+    
+    @app.route('/')
+    def index():
+        return render_template('index.html')
+        
+    @app.route('/api/schedule', methods=['POST'])
+    def create_schedule():
+        data = request.json
+        user_id = "web_user" # Demo user
+        courses = data.get('courses', {})
+        prefs = data.get('preferences', {})
+        
+        result = orchestrator.agents['scheduler'].create_schedule(user_id, courses, prefs)
+        return jsonify(result)
+        
+    @app.route('/api/progress', methods=['GET'])
+    def get_progress():
+        user_id = "web_user"
+        report = orchestrator.agents['progress'].get_report(user_id)
+        # Parse ASCII report to JSON or just return text? 
+        # For now, let's return the raw report and some metrics
+        metrics = orchestrator.agents['progress'].get_insights(user_id)
+        return jsonify({"report": report, "metrics": metrics})
+        
+    @app.route('/api/chat', methods=['POST'])
+    def chat():
+        data = request.json
+        user_input = data.get('message', '')
+        user_id = "web_user"
+        response = orchestrator.process_request(user_input, user_id)
+        return jsonify({"response": response})
+
+    print(f"{Fore.GREEN}Server running at http://127.0.0.1:5000{Style.RESET_ALL}")
+    app.run(debug=True, use_reloader=False)
 
 def main():
     parser = argparse.ArgumentParser(description="Personal Study Planner AI Agent")
@@ -215,7 +252,7 @@ def main():
     if args.mode == 'cli':
         run_cli(orchestrator)
     elif args.mode == 'web':
-        run_web()
+        run_web(orchestrator)
 
 if __name__ == "__main__":
     main()
